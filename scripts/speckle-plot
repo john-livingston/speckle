@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+
+import argparse
+
+import speckle
+
+
+parser = argparse.ArgumentParser(description="Plot NESSI data")
+parser.add_argument('-e', '--epic', help='EPIC ID', type=int, default=None)
+parser.add_argument('-d', '--data_dir', help='Directory containing NESSI data products',
+    type=str, default='.')
+args = parser.parse_args()
+
+if args.epic is None:
+    sys.exit('Must supply EPIC ID')
+
+epic = args.epic
+data_dir = args.data_dir
+
+spkl = speckle.Speckle(epic, data_dir)
+spkl.plot()
