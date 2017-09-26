@@ -10,6 +10,7 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import glob
 
 warnings.simplefilter('ignore', AstropyWarning)
+warnings.simplefilter('ignore', UserWarning)
 
 
 def normalize_01(im):
@@ -89,6 +90,7 @@ class Speckle:
         if fp is None:
             fp = 'EPIC-{}_cc.png'.format(self.epic)
 
+        fig.tight_layout()
         fig.savefig(fp, dpi=400)
         pl.close()
 
