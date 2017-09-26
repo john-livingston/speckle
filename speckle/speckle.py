@@ -1,16 +1,19 @@
 import os
 import numpy as np
+import warnings
 from astropy.io import fits
+from astropy.utils.exceptions import AstropyWarning
 import matplotlib.pyplot as pl
-
 from matplotlib.colors import LogNorm
 from seaborn.cm import mako as cm
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-
 import glob
+
+warnings.simplefilter('ignore', AstropyWarning)
 
 
 def normalize_01(im):
+
     return (im - im.min())/(im.max() - im.min())
 
 
@@ -25,6 +28,8 @@ class Speckle:
 
 
     def _load(self, epic, data_dir):
+
+        print("Loading data for EPIC-{}".format(epic))
 
         fp = glob.glob(os.path.join(data_dir, '{}*b.fits'.format(epic)))[0]
         hl = fits.open(fp)
@@ -41,6 +46,13 @@ class Speckle:
 
         fp = glob.glob(os.path.join(data_dir, '{}*r.dat'.format(epic)))[0]
         self._cc_r = np.loadtxt(fp, skiprows=19)
+
+        print("Data taken on {}".format(self.obs_date))
+
+
+    @property
+    def obs_date(self):
+        return self._hdr_r['DATE-OBS']
 
 
     def plot(self, fp=None):
@@ -73,7 +85,6 @@ class Speckle:
                 xlim=(rho.min(), rho.max()))
 
         ax.legend(loc='lower left')
-        fig.tight_layout()
 
         if fp is None:
             fp = '{}_cc.png'.format(self.epic)
@@ -81,6 +92,4 @@ class Speckle:
         fig.savefig(fp, dpi=400)
         pl.close()
 
-    @property
-    def obs_date(self):
-        return self._hdr_r['DATE-OBS']
+        print("Wrote file: {}".format(fp))
