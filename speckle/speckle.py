@@ -88,7 +88,7 @@ class Speckle:
         ax.legend(loc='lower left')
 
         if fp is None:
-            fp = 'EPIC-{}_cc.png'.format(self.epic)
+            fp = 'EPIC-{}_{}.png'.format(self.epic, self.obs_date)
 
         fig.tight_layout()
         fig.savefig(fp, dpi=400)
