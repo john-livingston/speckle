@@ -8,6 +8,12 @@ from matplotlib.colors import LogNorm
 from seaborn.cm import mako as cm
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import glob
+from matplotlib import rcParams
+rcParams["savefig.dpi"] = 150
+rcParams["figure.dpi"] = 150
+rcParams["xtick.direction"] = 'in'
+rcParams["ytick.direction"] = 'in'
+
 
 warnings.simplefilter('ignore', AstropyWarning)
 warnings.simplefilter('ignore', UserWarning)
@@ -66,15 +72,20 @@ class Speckle:
         rho, theta = self._cc_r.T
         ax.plot(rho, theta, label='832 nm')
         ax.invert_yaxis()
+        ax.xaxis.set_ticks_position('both')
+        ax.yaxis.set_ticks_position('both')
+        ax.minorticks_on()
 
         ax1 = inset_axes(ax, 4.4, 1.3, borderpad=2)
-        im = ax1.imshow(self._im_b, cmap=cm, norm=LogNorm(), interpolation='none')
+        vmin, vmax = np.percentile(self._im_b, 0.1), np.percentile(self._im_b, 99.9)
+        im = ax1.imshow(self._im_b, cmap=cm, norm=LogNorm(vmin=vmin, vmax=vmax), interpolation='none')
         ax1.xaxis.set_visible(False)
         ax1.yaxis.set_visible(False)
         ax1.set_title('562 nm', fontsize=10)
 
         ax2 = inset_axes(ax, 1.3, 1.3, borderpad=2)
-        im = ax2.imshow(self._im_r, cmap=cm, norm=LogNorm(), interpolation='none')
+        vmin, vmax = np.percentile(self._im_r, 0.1), np.percentile(self._im_r, 99.9)
+        im = ax2.imshow(self._im_r, cmap=cm, norm=LogNorm(vmin=vmin, vmax=vmax), interpolation='none')
         ax2.xaxis.set_visible(False)
         ax2.yaxis.set_visible(False)
         ax2.set_title('832 nm', fontsize=10)
