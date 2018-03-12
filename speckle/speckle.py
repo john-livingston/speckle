@@ -40,11 +40,13 @@ class Speckle:
 
         fp = glob.glob(os.path.join(data_dir, '{}*b.fits'.format(epic)))[0]
         hl = fits.open(fp)
+        self._fits_b = hl
         self._im_b = normalize_01(hl[0].data)
         self._hdr_b = hl[0].header
 
         fp = glob.glob(os.path.join(data_dir, '{}*r.fits'.format(epic)))[0]
         hl = fits.open(fp)
+        self._fits_r = hl
         self._im_r = normalize_01(hl[0].data)
         self._hdr_r = hl[0].header
 
@@ -64,13 +66,22 @@ class Speckle:
 
     def plot(self, fp=None):
 
+        colors = ['navy', 'turquoise', 'darkorange']
+        colors = ['navy', 'darkorange']
+
+        fontsize=30
+        pl.style.use('seaborn-ticks')
+
+        rcParams['font.family'] = 'serif'
+        rcParams['axes.facecolor'] = 'white'
+
         fig,ax = pl.subplots(1, 1, figsize=(5,3.5), sharex=True, sharey=True)
 
         rho, theta = self._cc_b.T
-        ax.plot(rho, theta, label='562 nm')
+        ax.plot(rho, theta, label='562 nm', color=colors[0], lw=2)
 
         rho, theta = self._cc_r.T
-        ax.plot(rho, theta, label='832 nm')
+        ax.plot(rho, theta, label='832 nm', color=colors[1], lw=2)
         ax.invert_yaxis()
         ax.xaxis.set_ticks_position('both')
         ax.yaxis.set_ticks_position('both')
@@ -82,6 +93,13 @@ class Speckle:
         ax1.xaxis.set_visible(False)
         ax1.yaxis.set_visible(False)
         ax1.set_title('562 nm', fontsize=10)
+        pixscale = 0.0175649 # arcsec/pixel
+        arcsec = int(round(1/pixscale))
+        xl, yl = ax1.get_xlim(), ax1.get_ylim()
+        xcoord = [xl[1]-1.3*arcsec, xl[1]-0.3*arcsec]
+        ycoord = [yl[0]+0.07*np.diff(yl), yl[0]+0.07*np.diff(yl)]
+        ax1.plot(xcoord, ycoord, color='white')
+        ax1.text(xcoord[0]*0.95, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
 
         ax2 = inset_axes(ax, 1.3, 1.3, borderpad=2)
         vmin, vmax = np.percentile(self._im_r, 0.1), np.percentile(self._im_r, 99.9)
@@ -89,14 +107,21 @@ class Speckle:
         ax2.xaxis.set_visible(False)
         ax2.yaxis.set_visible(False)
         ax2.set_title('832 nm', fontsize=10)
+        pixscale = 0.0181887 # arcsec/pixel
+        arcsec = int(round(1/pixscale))
+        xl, yl = ax2.get_xlim(), ax2.get_ylim()
+        xcoord = [xl[1]-1.3*arcsec, xl[1]-0.3*arcsec]
+        ycoord = [yl[0]+0.07*np.diff(yl), yl[0]+0.07*np.diff(yl)]
+        ax2.plot(xcoord, ycoord, color='white')
+        ax2.text(xcoord[0]*0.95, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
 
         pl.setp(ax,
-                title="EPIC-{}".format(self.epic),
+                title="EPIC {}".format(self.epic),
                 xlabel='Separation [arcsec]',
                 ylabel=r'$\Delta$mag',
                 xlim=(rho.min(), rho.max()))
 
-        ax.legend(loc='lower left')
+        ax.legend(loc='lower left', frameon=False)
 
         if fp is None:
             fp = 'EPIC-{}_{}.png'.format(self.epic, self.obs_date)
