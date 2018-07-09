@@ -8,18 +8,20 @@ import speckle
 
 
 parser = argparse.ArgumentParser(description="Plot NESSI data")
-parser.add_argument('-e', '--epic', help='EPIC ID', type=int, default=None)
+parser.add_argument('-i', '--id', help='ID', type=str, default=None)
 parser.add_argument('-d', '--data_dir', help='Directory containing NESSI data products',
     type=str, default='.')
+parser.add_argument('-s', '--stretch', help='y-axis stretch factor (default=1)', type=float, default=1)
 args = parser.parse_args()
 
-if args.epic is None:
-    sys.exit('Must supply EPIC ID')
+if args.id is None:
+    sys.exit('Must supply ID')
 
-epic = args.epic
+id_ = args.id
 data_dir = args.data_dir
+stretch = args.stretch
 
-spkl = speckle.Speckle(epic, data_dir)
-spkl.plot()
+spkl = speckle.Speckle(id_, data_dir)
+spkl.plot(stretch=stretch)
 
 print("Script executed in {0:.1f} seconds\n".format(time.time() - tick))

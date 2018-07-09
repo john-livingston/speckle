@@ -26,34 +26,34 @@ def normalize_01(im):
 
 class Speckle:
 
-    def __init__(self, epic, data_dir):
+    def __init__(self, name, data_dir):
 
-        self.epic = epic
+        self.name = name
         self.data_dir = data_dir
 
-        self._load(epic, data_dir)
+        self._load(name, data_dir)
 
 
-    def _load(self, epic, data_dir):
+    def _load(self, name, data_dir):
 
-        print("Loading data for EPIC-{}".format(epic))
+        print("Loading {} data".format(name))
 
-        fp = glob.glob(os.path.join(data_dir, '{}*b.fits'.format(epic)))[0]
+        fp = glob.glob(os.path.join(data_dir, '{}*b.fits'.format(name)))[0]
         hl = fits.open(fp)
         self._fits_b = hl
         self._im_b = normalize_01(hl[0].data)
         self._hdr_b = hl[0].header
 
-        fp = glob.glob(os.path.join(data_dir, '{}*r.fits'.format(epic)))[0]
+        fp = glob.glob(os.path.join(data_dir, '{}*r.fits'.format(name)))[0]
         hl = fits.open(fp)
         self._fits_r = hl
         self._im_r = normalize_01(hl[0].data)
         self._hdr_r = hl[0].header
 
-        fp = glob.glob(os.path.join(data_dir, '{}*b.dat'.format(epic)))[0]
+        fp = glob.glob(os.path.join(data_dir, '{}*b.dat'.format(name)))[0]
         self._cc_b = np.loadtxt(fp, skiprows=19)
 
-        fp = glob.glob(os.path.join(data_dir, '{}*r.dat'.format(epic)))[0]
+        fp = glob.glob(os.path.join(data_dir, '{}*r.dat'.format(name)))[0]
         self._cc_r = np.loadtxt(fp, skiprows=19)
 
         print("Data taken on {}".format(self.obs_date))
@@ -64,7 +64,7 @@ class Speckle:
         return self._hdr_r['DATE-OBS']
 
 
-    def plot(self, fp=None):
+    def plot(self, fp=None, stretch=1):
 
         colors = ['navy', 'turquoise', 'darkorange']
         colors = ['navy', 'darkorange']
@@ -115,16 +115,19 @@ class Speckle:
         ax2.plot(xcoord, ycoord, color='white')
         ax2.text(xcoord[0]*0.95, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
 
+        yl = ax.get_ylim()
+        ylim = (stretch * yl[0], yl[1])
         pl.setp(ax,
-                title="EPIC {}".format(self.epic),
+                title=self.name,
                 xlabel='Separation [arcsec]',
                 ylabel=r'$\Delta$mag',
-                xlim=(rho.min(), rho.max()))
+                xlim=(rho.min(), rho.max()),
+                ylim=ylim)
 
         ax.legend(loc='lower left', frameon=False)
 
         if fp is None:
-            fp = 'EPIC-{}_{}.png'.format(self.epic, self.obs_date)
+            fp = '{}_{}.png'.format(self.name, self.obs_date)
 
         fig.tight_layout()
         fig.savefig(fp, dpi=400)
