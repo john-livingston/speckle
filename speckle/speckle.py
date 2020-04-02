@@ -1,4 +1,5 @@
 import os
+import sys
 import numpy as np
 import warnings
 from astropy.io import fits
@@ -11,9 +12,10 @@ import glob
 from matplotlib import rcParams
 rcParams["savefig.dpi"] = 150
 rcParams["figure.dpi"] = 150
-rcParams["xtick.direction"] = 'in'
-rcParams["ytick.direction"] = 'in'
-
+if sys.platform == 'linux':
+    pl.rcParams['font.family'] = 'Liberation Sans'
+elif sys.platform == 'darwin':
+    pl.rcParams['font.family'] = 'Arial'
 
 warnings.simplefilter('ignore', AstropyWarning)
 warnings.simplefilter('ignore', UserWarning)
@@ -64,16 +66,21 @@ class Speckle:
         return self._hdr_r['DATE-OBS']
 
 
-    def plot(self, fp=None, stretch=1):
+    def plot(self, title=None, fp=None, stretch=1):
 
-        colors = ['navy', 'turquoise', 'darkorange']
-        colors = ['navy', 'darkorange']
+        # colors = ['navy', 'turquoise', 'darkorange']
+        colors = ['#01cdfe', '#ff71ce']
 
         fontsize=30
         pl.style.use('seaborn-ticks')
 
-        rcParams['font.family'] = 'serif'
+        # rcParams['font.family'] = 'serif'
         rcParams['axes.facecolor'] = 'white'
+        rcParams["xtick.direction"] = 'in'
+        rcParams["ytick.direction"] = 'in'
+
+        if title is None:
+            title = self.name
 
         fig,ax = pl.subplots(1, 1, figsize=(5,3.5), sharex=True, sharey=True)
 
@@ -99,7 +106,7 @@ class Speckle:
         xcoord = [xl[1]-1.3*arcsec, xl[1]-0.3*arcsec]
         ycoord = [yl[0]+0.07*np.diff(yl), yl[0]+0.07*np.diff(yl)]
         ax1.plot(xcoord, ycoord, color='white')
-        ax1.text(xcoord[0]*0.95, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+        ax1.text(xcoord[0]*0.97, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
 
         ax2 = inset_axes(ax, 1.3, 1.3, borderpad=2)
         vmin, vmax = np.percentile(self._im_r, 0.1), np.percentile(self._im_r, 99.9)
@@ -113,12 +120,12 @@ class Speckle:
         xcoord = [xl[1]-1.3*arcsec, xl[1]-0.3*arcsec]
         ycoord = [yl[0]+0.07*np.diff(yl), yl[0]+0.07*np.diff(yl)]
         ax2.plot(xcoord, ycoord, color='white')
-        ax2.text(xcoord[0]*0.95, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+        ax2.text(xcoord[0]*0.97, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
 
         yl = ax.get_ylim()
         ylim = (stretch * yl[0], yl[1])
         pl.setp(ax,
-                title=self.name,
+                title=title,
                 xlabel='Separation [arcsec]',
                 ylabel=r'$\Delta$mag',
                 xlim=(rho.min(), rho.max()),
