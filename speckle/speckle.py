@@ -6,7 +6,7 @@ from astropy.io import fits
 from astropy.utils.exceptions import AstropyWarning
 import matplotlib.pyplot as pl
 from matplotlib.colors import LogNorm
-from seaborn.cm import mako as cm
+from seaborn.cm import mako
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import glob
 from matplotlib import rcParams
@@ -66,10 +66,20 @@ class Speckle:
         return self._hdr_r['DATE-OBS']
 
 
-    def plot(self, title=None, fp=None, stretch=1):
+    def plot(self, title=None, fp=None, stretch=1, vrange=None, cmap=None):
 
         # colors = ['navy', 'turquoise', 'darkorange']
         colors = ['#01cdfe', '#ff71ce']
+
+        if vrange is None:
+            vrange = 0.1, 99.9
+
+        if cmap is None:
+            cm = mako
+        elif cmap == 'gray':
+            cm = pl.cm.gray
+        elif cmap == 'gray_r':
+            cm = pl.cm.gray_r
 
         fontsize=30
         pl.style.use('seaborn-ticks')
@@ -95,7 +105,7 @@ class Speckle:
         ax.minorticks_on()
 
         ax1 = inset_axes(ax, 4.4, 1.3, borderpad=2)
-        vmin, vmax = np.percentile(self._im_b, 0.1), np.percentile(self._im_b, 99.9)
+        vmin, vmax = np.percentile(self._im_b, vrange[0]), np.percentile(self._im_b, vrange[1])
         im = ax1.imshow(self._im_b, cmap=cm, norm=LogNorm(vmin=vmin, vmax=vmax), interpolation='none')
         ax1.xaxis.set_visible(False)
         ax1.yaxis.set_visible(False)
@@ -109,7 +119,7 @@ class Speckle:
         ax1.text(xcoord[0]*0.97, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
 
         ax2 = inset_axes(ax, 1.3, 1.3, borderpad=2)
-        vmin, vmax = np.percentile(self._im_r, 0.1), np.percentile(self._im_r, 99.9)
+        vmin, vmax = np.percentile(self._im_r, vrange[0]), np.percentile(self._im_r, vrange[1])
         im = ax2.imshow(self._im_r, cmap=cm, norm=LogNorm(vmin=vmin, vmax=vmax), interpolation='none')
         ax2.xaxis.set_visible(False)
         ax2.yaxis.set_visible(False)
