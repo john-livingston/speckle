@@ -28,35 +28,59 @@ def normalize_01(im):
 
 class Speckle:
 
-    def __init__(self, name, data_dir):
+    def __init__(self, name, data_dir, inst="NESSI"):
 
         self.name = name
         self.data_dir = data_dir
-
+        self.inst = inst
+        if inst == "NESSI":
+            self.blue_name = 'b'
+            self.red_name = 'r'
+            self.blue_wav = 562
+            self.red_wav = 832
+            self.skiprows = 19
+        elif inst == "DSSI":
+            self.blue_name = 'a'
+            self.red_name = 'b'
+            self.blue_wav = 692
+            self.red_wav = 880            
+            self.skiprows = 29
+        elif inst == "Zorro":
+            self.blue_name = 'b'
+            self.red_name = 'r'
+            self.blue_wav = 562
+            self.red_wav = 832
+            self.skiprows = 29
+        elif inst == "Alopeke":
+            self.blue_name = '562'
+            self.red_name = '832'
+            self.blue_wav = 562
+            self.red_wav = 832
+            self.skiprows = 29
+            
         self._load(name, data_dir)
-
 
     def _load(self, name, data_dir):
 
         print("Loading {} data".format(name))
 
-        fp = glob.glob(os.path.join(data_dir, '{}*b.fits'.format(name)))[0]
+        fp = glob.glob(os.path.join(data_dir, '{}*{}.fits'.format(name, self.blue_name)))[0]
         hl = fits.open(fp)
         self._fits_b = hl
         self._im_b = normalize_01(hl[0].data)
         self._hdr_b = hl[0].header
 
-        fp = glob.glob(os.path.join(data_dir, '{}*r.fits'.format(name)))[0]
+        fp = glob.glob(os.path.join(data_dir, '{}*{}.fits'.format(name, self.red_name)))[0]
         hl = fits.open(fp)
         self._fits_r = hl
         self._im_r = normalize_01(hl[0].data)
         self._hdr_r = hl[0].header
 
-        fp = glob.glob(os.path.join(data_dir, '{}*b.dat'.format(name)))[0]
-        self._cc_b = np.loadtxt(fp, skiprows=19)
+        fp = glob.glob(os.path.join(data_dir, '{}*{}.dat'.format(name, self.blue_name)))[0]
+        self._cc_b = np.loadtxt(fp, skiprows=self.skiprows)
 
-        fp = glob.glob(os.path.join(data_dir, '{}*r.dat'.format(name)))[0]
-        self._cc_r = np.loadtxt(fp, skiprows=19)
+        fp = glob.glob(os.path.join(data_dir, '{}*{}.dat'.format(name, self.red_name)))[0]
+        self._cc_r = np.loadtxt(fp, skiprows=self.skiprows)
 
         print("Data taken on {}".format(self.obs_date))
 
@@ -66,10 +90,10 @@ class Speckle:
         return self._hdr_r['DATE-OBS']
 
 
-    def plot(self, title=None, fp=None, stretch=1, vrange=None, cmap=None):
+    def plot(self, figsize=(5,3.5), title=None, fp=None, stretch=1, vrange=None, cmap=None, c1='#01cdfe', c2='#ff71ce'):
 
         # colors = ['navy', 'turquoise', 'darkorange']
-        colors = ['#01cdfe', '#ff71ce']
+        colors = [c1, c2]
 
         if vrange is None:
             vrange = 0.1, 99.9
@@ -92,13 +116,13 @@ class Speckle:
         if title is None:
             title = self.name
 
-        fig,ax = pl.subplots(1, 1, figsize=(5,3.5), sharex=True, sharey=True)
+        fig,ax = pl.subplots(1, 1, figsize=figsize)
 
         rho, theta = self._cc_b.T
-        ax.plot(rho, theta, label='562 nm', color=colors[0], lw=2)
+        ax.plot(rho, theta, label=f'{self.blue_wav} nm', color=colors[0], lw=2)
 
         rho, theta = self._cc_r.T
-        ax.plot(rho, theta, label='832 nm', color=colors[1], lw=2)
+        ax.plot(rho, theta, label=f'{self.red_wav} nm', color=colors[1], lw=2)
         ax.invert_yaxis()
         ax.xaxis.set_ticks_position('both')
         ax.yaxis.set_ticks_position('both')
@@ -109,28 +133,44 @@ class Speckle:
         im = ax1.imshow(self._im_b, cmap=cm, norm=LogNorm(vmin=vmin, vmax=vmax), interpolation='none')
         ax1.xaxis.set_visible(False)
         ax1.yaxis.set_visible(False)
-        ax1.set_title('562 nm', fontsize=10)
-        pixscale = 0.0175649 # arcsec/pixel
+        ax1.set_title(f'{self.blue_wav} nm', fontsize=10)
+#         pixscale = 0.0175649 # arcsec/pixel
+        pixscale = self._hdr_b['PIXSCL']
         arcsec = int(round(1/pixscale))
         xl, yl = ax1.get_xlim(), ax1.get_ylim()
         xcoord = [xl[1]-1.3*arcsec, xl[1]-0.3*arcsec]
         ycoord = [yl[0]+0.07*np.diff(yl), yl[0]+0.07*np.diff(yl)]
         ax1.plot(xcoord, ycoord, color='white')
-        ax1.text(xcoord[0]*0.97, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+        if self.inst == "NESSI":
+            ax1.text(xcoord[0]*0.95, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+        elif self.inst == "DSSI":
+            ax1.text(xcoord[0]*1.08, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+        elif self.inst == "Zorro":
+            ax1.text(xcoord[0]*0.99, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+        elif self.inst == "Alopeke":
+            ax1.text(xcoord[0]*0.99, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
 
         ax2 = inset_axes(ax, 1.3, 1.3, borderpad=2)
         vmin, vmax = np.percentile(self._im_r, vrange[0]), np.percentile(self._im_r, vrange[1])
         im = ax2.imshow(self._im_r, cmap=cm, norm=LogNorm(vmin=vmin, vmax=vmax), interpolation='none')
         ax2.xaxis.set_visible(False)
         ax2.yaxis.set_visible(False)
-        ax2.set_title('832 nm', fontsize=10)
-        pixscale = 0.0181887 # arcsec/pixel
+        ax2.set_title(f'{self.red_wav} nm', fontsize=10)
+#         pixscale = 0.0181887 # arcsec/pixel
+        pixscale = self._hdr_r['PIXSCL']
         arcsec = int(round(1/pixscale))
         xl, yl = ax2.get_xlim(), ax2.get_ylim()
         xcoord = [xl[1]-1.3*arcsec, xl[1]-0.3*arcsec]
         ycoord = [yl[0]+0.07*np.diff(yl), yl[0]+0.07*np.diff(yl)]
         ax2.plot(xcoord, ycoord, color='white')
-        ax2.text(xcoord[0]*0.97, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+        if self.inst == "NESSI":
+            ax2.text(xcoord[0]*0.95, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+        elif self.inst == "DSSI":
+            ax2.text(xcoord[0]*1.05, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+        elif self.inst == "Zorro":
+            ax2.text(xcoord[0]*0.95, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+        elif self.inst == "Alopeke":
+            ax2.text(xcoord[0]*0.95, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
 
         yl = ax.get_ylim()
         ylim = (stretch * yl[0], yl[1])
