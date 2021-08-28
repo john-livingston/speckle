@@ -43,7 +43,7 @@ class Speckle:
             self.blue_name = 'a'
             self.red_name = 'b'
             self.blue_wav = 692
-            self.red_wav = 880            
+            self.red_wav = 880
             self.skiprows = 29
         elif inst == "Zorro":
             self.blue_name = 'b'
@@ -57,7 +57,7 @@ class Speckle:
             self.blue_wav = 562
             self.red_wav = 832
             self.skiprows = 29
-            
+
         self._load(name, data_dir)
 
     def _load(self, name, data_dir):
@@ -142,13 +142,13 @@ class Speckle:
         ycoord = [yl[0]+0.07*np.diff(yl), yl[0]+0.07*np.diff(yl)]
         ax1.plot(xcoord, ycoord, color='white')
         if self.inst == "NESSI":
-            ax1.text(xcoord[0]*0.95, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+            ax1.text(xcoord[0]*0.98, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
         elif self.inst == "DSSI":
             ax1.text(xcoord[0]*1.08, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
         elif self.inst == "Zorro":
-            ax1.text(xcoord[0]*0.99, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+            ax1.text(xcoord[0]*1.12, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
         elif self.inst == "Alopeke":
-            ax1.text(xcoord[0]*0.99, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+            ax1.text(xcoord[0]*1.12, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
 
         ax2 = inset_axes(ax, 1.3, 1.3, borderpad=2)
         vmin, vmax = np.percentile(self._im_r, vrange[0]), np.percentile(self._im_r, vrange[1])
@@ -164,13 +164,13 @@ class Speckle:
         ycoord = [yl[0]+0.07*np.diff(yl), yl[0]+0.07*np.diff(yl)]
         ax2.plot(xcoord, ycoord, color='white')
         if self.inst == "NESSI":
-            ax2.text(xcoord[0]*0.95, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+            ax2.text(xcoord[0]*0.98, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
         elif self.inst == "DSSI":
-            ax2.text(xcoord[0]*1.05, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+            ax2.text(xcoord[0]*1.08, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
         elif self.inst == "Zorro":
-            ax2.text(xcoord[0]*0.95, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+            ax2.text(xcoord[0]*1.12, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
         elif self.inst == "Alopeke":
-            ax2.text(xcoord[0]*0.95, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+            ax2.text(xcoord[0]*1.12, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
 
         yl = ax.get_ylim()
         ylim = (stretch * yl[0], yl[1])
