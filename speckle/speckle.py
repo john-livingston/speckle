@@ -191,3 +191,44 @@ class Speckle:
         pl.close()
 
         print("Wrote file: {}".format(fp))
+
+
+def cli():
+
+    import sys
+    import time
+    tick = time.time()
+
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Plot speckle imaging data")
+    parser.add_argument('-i', '--id', help='ID', type=str, default=None)
+    parser.add_argument('-d', '--data_dir', help='Directory containing the data products',
+        type=str, default='.')
+    parser.add_argument('-s', '--stretch', help='y-axis stretch factor (default=1)', type=float, default=1)
+    parser.add_argument('-n', '--name', help='Target name', type=str, default=None)
+    parser.add_argument('-v', '--vrange', help='Log stretch vrange', type=str, default=None)
+    parser.add_argument('-c', '--cmap', help='Color map name', type=str, default=None)
+    parser.add_argument('-f', '--figsize', help='Figure size (comma-separated)', type=str, default='5,3.5')
+    parser.add_argument('--inst', help='Instrument name', type=str, default='NESSI')
+    args = parser.parse_args()
+
+    if args.id is None:
+        sys.exit('Must supply ID')
+
+    id_ = args.id
+    data_dir = args.data_dir
+    stretch = args.stretch
+    name = args.name
+    vrange = args.vrange
+    cmap = args.cmap
+    inst = args.inst
+    figsize = [float(i) for i in args.figsize.split(',')]
+
+    if vrange is not None:
+        vrange = list(map(float,vrange.split(',')))
+
+    spkl = Speckle(id_, data_dir, inst=inst)
+    spkl.plot(figsize=figsize, title=name, stretch=stretch, vrange=vrange, cmap=cmap)
+
+    print("Script executed in {0:.1f} seconds\n".format(time.time() - tick))
