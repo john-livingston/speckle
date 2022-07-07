@@ -76,10 +76,10 @@ class Speckle:
         self._im_r = normalize_01(hl[0].data)
         self._hdr_r = hl[0].header
 
-        fp = glob.glob(os.path.join(data_dir, '{}*{}.dat'.format(name, self.blue_name)))[0]
+        fp = glob.glob(os.path.join(data_dir, '{}*{}*.dat'.format(name, self.blue_name)))[0]
         self._cc_b = np.loadtxt(fp, skiprows=self.skiprows)
 
-        fp = glob.glob(os.path.join(data_dir, '{}*{}.dat'.format(name, self.red_name)))[0]
+        fp = glob.glob(os.path.join(data_dir, '{}*{}*.dat'.format(name, self.red_name)))[0]
         self._cc_r = np.loadtxt(fp, skiprows=self.skiprows)
 
         print("Data taken on {}".format(self.obs_date))
