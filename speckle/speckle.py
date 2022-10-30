@@ -44,7 +44,7 @@ class Speckle:
             self.red_name = 'b'
             self.blue_wav = 692
             self.red_wav = 880
-            self.skiprows = 29
+            self.skiprows = 33
         elif inst == "Zorro":
             self.blue_name = 'b'
             self.red_name = 'r'
@@ -130,7 +130,7 @@ class Speckle:
 
         ax1 = inset_axes(ax, 4.4, 1.3, borderpad=2)
         vmin, vmax = np.percentile(self._im_b, vrange[0]), np.percentile(self._im_b, vrange[1])
-        im = ax1.imshow(self._im_b, cmap=cm, norm=LogNorm(vmin=vmin, vmax=vmax), interpolation='none')
+        im = ax1.imshow(self._im_b, cmap=cm, norm=LogNorm(vmin=vmin, vmax=vmax), interpolation='none', origin='lower')
         ax1.xaxis.set_visible(False)
         ax1.yaxis.set_visible(False)
         ax1.set_title(f'{self.blue_wav} nm', fontsize=10)
@@ -142,17 +142,17 @@ class Speckle:
         ycoord = [yl[0]+0.07*np.diff(yl), yl[0]+0.07*np.diff(yl)]
         ax1.plot(xcoord, ycoord, color='white')
         if self.inst == "NESSI":
-            ax1.text(xcoord[0]*0.98, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+            ax1.text(xcoord[0]*0.98, ycoord[0]*1.2, '1 arcsec', color='white', fontsize=6)
         elif self.inst == "DSSI":
-            ax1.text(xcoord[0]*1.08, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+            ax1.text(xcoord[0]*1.08, ycoord[0]*1.2, '1 arcsec', color='white', fontsize=6)
         elif self.inst == "Zorro":
-            ax1.text(xcoord[0]*1.12, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+            ax1.text(xcoord[0]*1.12, ycoord[0]*1.2, '1 arcsec', color='white', fontsize=6)
         elif self.inst == "Alopeke":
-            ax1.text(xcoord[0]*1.12, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+            ax1.text(xcoord[0]*1.12, ycoord[0]*1.2, '1 arcsec', color='white', fontsize=6)
 
         ax2 = inset_axes(ax, 1.3, 1.3, borderpad=2)
         vmin, vmax = np.percentile(self._im_r, vrange[0]), np.percentile(self._im_r, vrange[1])
-        im = ax2.imshow(self._im_r, cmap=cm, norm=LogNorm(vmin=vmin, vmax=vmax), interpolation='none')
+        im = ax2.imshow(self._im_r, cmap=cm, norm=LogNorm(vmin=vmin, vmax=vmax), interpolation='none', origin='lower')
         ax2.xaxis.set_visible(False)
         ax2.yaxis.set_visible(False)
         ax2.set_title(f'{self.red_wav} nm', fontsize=10)
@@ -164,13 +164,13 @@ class Speckle:
         ycoord = [yl[0]+0.07*np.diff(yl), yl[0]+0.07*np.diff(yl)]
         ax2.plot(xcoord, ycoord, color='white')
         if self.inst == "NESSI":
-            ax2.text(xcoord[0]*0.98, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+            ax2.text(xcoord[0]*0.98, ycoord[0]*1.2, '1 arcsec', color='white', fontsize=6)
         elif self.inst == "DSSI":
-            ax2.text(xcoord[0]*1.08, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+            ax2.text(xcoord[0]*1.08, ycoord[0]*1.2, '1 arcsec', color='white', fontsize=6)
         elif self.inst == "Zorro":
-            ax2.text(xcoord[0]*1.12, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+            ax2.text(xcoord[0]*1.12, ycoord[0]*1.2, '1 arcsec', color='white', fontsize=6)
         elif self.inst == "Alopeke":
-            ax2.text(xcoord[0]*1.12, ycoord[0]*0.95, '1 arcsec', color='white', fontsize=6)
+            ax2.text(xcoord[0]*1.12, ycoord[0]*1.2, '1 arcsec', color='white', fontsize=6)
 
         yl = ax.get_ylim()
         ylim = (stretch * yl[0], yl[1])
