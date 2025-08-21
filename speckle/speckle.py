@@ -46,8 +46,8 @@ class Speckle:
             self.red_wav = 880
             self.skiprows = 33
         elif inst == "Zorro":
-            self.blue_name = 'b'
-            self.red_name = 'r'
+            self.blue_name = '562'
+            self.red_name = '832'
             self.blue_wav = 562
             self.red_wav = 832
             self.skiprows = 29
@@ -106,7 +106,7 @@ class Speckle:
             cm = pl.cm.gray_r
 
         fontsize=30
-        pl.style.use('seaborn-ticks')
+        pl.style.use('seaborn-v0_8-ticks')
 
         # rcParams['font.family'] = 'serif'
         rcParams['axes.facecolor'] = 'white'
